@@ -3,13 +3,31 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=divice-width,initaial-scale=1.0,user-scale=no" />
+<script src="https://unpkg.com/vue@2.6.10/dist/vue.js"></script>
+<script src="https://unpkg.com/vue@2.6.10/dist/vue.js"></script>
+<script src="https://unpkg.com/element-ui@2.12.0/lib/index.js"></script>
+<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+<style>
+    @import url("https://unpkg.com/element-ui@2.12.0/lib/theme-chalk/index.css");
+</style>
 <title>数字时钟</title>
 </head>
 
 <body>
-    <canvas id="canvas" style="display:block;">
-        当前浏览器不支持Canvas，请更换浏览器后再试
-    </canvas>
+    <div id="app" style="height:400px;">
+        <canvas  v-for="(item,index) in lattice" v-bind:id="'a'+item" @click="draw(index)"  @mouseenter="enter(index)"> 
+            当前浏览器不支持Canvas，请更换浏览器后再试
+        </canvas>
+    </div>
+    <div id="draw">
+        <canvas  v-for="(item,index) in lattice" v-bind:id="'b'+item"> 
+            当前浏览器不支持Canvas，请更换浏览器后再试
+        </canvas>
+    </div>
+
+
+
 
     <script src="js/digit.js"></script>
     <script src="js/countdown.js"></script>
