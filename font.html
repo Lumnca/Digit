@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>字体点阵</title>
+</head>
+<style>
+	div{
+		border: 1px solid #000000;
+	}
+</style>
+<body>
+	<div id="main">
+		
+	</div>
+	<br>
+	内容<input type="text" value="" /><br>
+	大小<input type="text" value="" /><br>
+	字体<input type="text" value="" /><br>
+	其他<input type="text" value="" /><br>
+	<button onclick="ss()"> 提交</button>
+<script>
+  function TextPointSet() {
+  }
+  TextPointSet.prototype.points = {}
+  TextPointSet.prototype.size = 16;
+  TextPointSet.prototype.padding = 14;
+  TextPointSet.prototype.canvas = document.createElement('canvas');
+  TextPointSet.prototype.ctx = TextPointSet.prototype.canvas.getContext('2d');
+  TextPointSet.prototype.get = function (text) {
+    return this.points[text] || this._createTextPoint(text);
+  }
+  TextPointSet.prototype.getAll = function (text) {
+    var that = this;
+    return text.split('').map(function (item) {
+      return that.get(item);
+    })
+  }
+  TextPointSet.prototype._createTextPoint = function (text) {
+    var canvas = this.canvas, ctx = this.ctx, size = this.size;
+    this.clearCanvas();
+    canvas.width = canvas.height = size;
+    ctx.font = size + "px SimSun";
+    ctx.fillText(text, 0, this.padding);
+    var canvasData = ctx.getImageData(0, 0, size, size).data,
+      textPointSet = [];
+    for (var i = 0; i < size; i++) {
+      textPointSet.push(temp = []);
+      for (var j = 0; j < size; j++) {
+        var index = i * size * 4 + j * 4;
+        var r = canvasData[index],
+          g = canvasData[index + 1],
+          b = canvasData[index + 2],
+          a = canvasData[index + 3];
+        temp.push(a ? 1 : 0);
+      }
+    }
+    return this.points[text] = textPointSet;
+  }
+  TextPointSet.prototype.clearCanvas = function () {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+  }
+  TextPointSet.prototype.getCanvas = function (points, options) {
+    if(!options){
+      options = {
+        size:100,
+        pointScale:.2
+      }
+    }
+    var canvas = document.createElement('canvas'),
+     ctx = canvas.getContext('2d'),
+    length = points.length,
+      oneTempLength = options.size / length;
+    canvas.height = canvas.width = options.size;
+    for (var i = 0; i < length; i++) {
+      for (var j = 0; j < length; j++) {
+        if (points[i][j]) {
+          ctx.beginPath();
+          ctx.arc(oneTempLength * (j + .5), oneTempLength * (i + .5), oneTempLength * options.pointScale, 0, Math.PI * 2)
+          ctx.fill()
+        }
+      }
+    }
+    return canvas;
+  }
+  TextPointSet.prototype.getCanvasWithText = function (text,options){
+    return this.getCanvas(this.get(text,options))
+  }
+  var reloadCanvas = function(){
+	  var cavs = document.getElementsByTagName('canvas');
+	 while(cavs && cavs.length > 0){
+		 cavs[0].remove();
+	 }
+  }
+	 var textTest = new TextPointSet();
+	
+	 var s = document.getElementsByTagName("input")[0].value ;
+	  textTest.getAll(' 123 ').map(item=>{
+		document.getElementById('main').appendChild(textTest.getCanvas(item,{
+		  size:70,pointScale:.3
+		}));
+	  })
+	  // var textPoints = textTest.get('');
+  // document.body.appendChild(textTest.getCanvas(textPoints));
+  // document.body.appendChild(textTest.getCanvasWithText('好'));
+
+
+ function ss(){
+	 reloadCanvas();
+	 var s = document.getElementsByTagName("input")[0].value ;
+	 
+	 
+	 var textTest = new TextPointSet();
+	 	
+		textTest.size = document.getElementsByTagName("input")[1].value;
+		textTest.padding = (textTest.size/16)*14;
+		
+	 var s = document.getElementsByTagName("input")[0].value ;
+	  textTest.getAll(s).map(item=>{
+	 		document.getElementById('main').appendChild(textTest.getCanvas(item,{
+	 		  size:70,pointScale:.3
+	 		}));
+	  })
+ }
+ 
+</script>
+</body>
+</html>
