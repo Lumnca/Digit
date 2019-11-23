@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>字体取模测试</title>
+		<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+
+	</head>
+	<body>
+		<input id="txt" type="text" placeholder="输入测试字符串">
+		<select id="f">
+			<option>16px</option>
+			<option>32px</option>
+		</select>
+		<button>获取数据</button>
+		<br>
+
+		<pre id="a"></pre>
+		<br>
+		<div id="c" style="overflow: scroll; width: 120rem;">
+			
+		</div>
+		<canvas id="b" width="300" height="120"></canvas>
+	</body>
+
+	<script>
+		var dataArray = [];
+
+		$(document).ready(function() {
+			$("button").click(function() {
+				document.getElementById('a').innerHTML = "";
+				var fontsize = document.getElementById('f').value;
+				if (fontsize == "16px") {
+					for (let i = 0; i < document.getElementById('txt').value.length; i++) {
+
+						$.post("http://47.106.254.86:1234/server1.php", {
+								txt: document.getElementById('txt').value[i],
+							},
+
+							function(data, status) {
+								var srt = JSON.parse(data);
+								srt.forEach((item) => {
+									var zero = '00000000';
+									var hex = parseInt(item, 16).toString(2);
+									var tmp = 8 - hex.length;
+									dataArray.push(zero.substr(0, tmp) + hex);
+								});
+
+								var fontData = dataArray.join('');
+								var canvas = document.createElement('canvas');
+								var ctx2 = canvas.getContext('2d');
+								canvas.width = 600;
+								canvas.height = 600;
+								for (let i = 0; i < 16; i++) {
+									for (let j = 0; j < 16; j++) {
+										if (fontData[i * 16 + j] == "1") {
+											console.log("OK");
+											ctx2.beginPath();
+											ctx2.arc(j * 7, 7 * i, 3.5, 0, 2 * Math.PI, true);
+											ctx2.fillStyle = "rgba(255,255,0,255)";
+											ctx2.fill();
+										} else {
+											ctx2.beginPath();
+											ctx2.arc(7 * j, 7 * i, 3.5, 0, 2 * Math.PI, true);
+											ctx2.fillStyle = "rgba(255,0,0,255)";
+											ctx2.fill();
+										}
+									}
+								}
+								document.getElementById('c').appendChild(canvas);
+							});
+
+					}
+
+
+					console.log(dataArray);
+				} else {
+					for (let i = 0; i < document.getElementById('txt').value.length; i++) {
+
+						$.post("http://47.106.254.86:1234/server2.php", {
+								txt: document.getElementById('txt').value[i],
+							},
+
+							function(data, status) {
+								//alert("数据: \n" + data + "\n状态: " + status);
+
+								var srt = JSON.parse(data);
+
+								var datas = srt.map(item => {
+									return "0x" + item
+								});
+
+								//document.getElementById('a').innerHTML += "<br>"+ datas;
+							});
+
+
+					}
+				}
+
+			});
+		});
+	</script>
+</html>
